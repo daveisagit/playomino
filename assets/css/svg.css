@@ -1,0 +1,31 @@
+/*===== VARIABLES CSS =====*/
+:root {
+    /*========== Cells ==========*/
+    --cell-border: lightgrey;
+    --cell-fill: lightskyblue;
+    --cell-stroke: black;
+    --cell-stroke-width: 1;
+}
+
+
+.border>polygon {
+    fill: transparent;
+    stroke: var(--cell-border);
+}
+
+.border>polygon:hover {
+    fill: var(--cell-border);
+}
+
+
+.cell>polygon {
+    stroke: var(--cell-stroke);
+    fill: var(--cell-fill);
+    stroke-width: var(--cell-stroke-width);
+}
+
+
+/* Dark Mode */
+div.dark .cell>polygon {
+    stroke: var(--cell-border);
+}

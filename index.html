@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--========== BOX ICONS ==========-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
+    <!--========== Google Material Icons ==========-->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <!--========== Bootstrap ==========-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!--========== SVG CSS ==========-->
+    <link rel="stylesheet" href="assets/css/svg.css">
+
+    <title>Playominos</title>
+
+    <!-- <link rel="apple-touch-icon" sizes="180x180" href="assets/favi/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favi/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favi/favicon-16x16.png">
+    <link rel="manifest" href="assets/favi/site.webmanifest"> -->
+
+</head>
+
+<body>
+    <!--========== HEADER ==========-->
+    <div class="container-fluid text-center">
+        <div class="py-2 row">
+            <div class="col text-start">
+                <span title="Clear and start again" class="p-3 material-symbols-outlined interests__icon"
+                    id="btnClear">mop</span>
+                <span title="Undo" class="p-3 material-symbols-outlined interests__icon" id="btnUndo">undo</span>
+                <span title="Redo" class="p-3 material-symbols-outlined interests__icon" id="btnRedo">redo</span>
+
+            </div>
+            <div class="col">
+                <h1>Poly Play</h1>
+            </div>
+            <div class="col text-end">
+                <i class="p-3 h4 bx bx-moon change-theme" title="Theme Light/Dark mode" id="theme-button"></i>
+            </div>
+        </div>
+
+        <!-- Render the grid layout in this div-->
+        <div id="gridId"></div>
+
+    </div>
+
+    <!-- bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+    <!-- d3 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js"></script>
+
+    <!-- main -->
+    <script type="module" src="assets/js/main.js"></script>
+
+</body>
