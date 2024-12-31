@@ -202,6 +202,10 @@ redoButton.addEventListener("click", () => {
 });
 
 
+window.addEventListener('resize', function (event) {
+    refresh_grid();
+});
+
 
 /*
 =========================================================================
