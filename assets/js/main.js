@@ -216,8 +216,9 @@ window.addEventListener('orientationchange', function (event) {
 MAIN Script
 =========================================================================
 */
+const header_row = document.getElementById("headerRow");
 var wdw_w = window.innerWidth;
-var wdw_h = window.innerHeight - 100;
+var wdw_h = window.innerHeight - header_row.offsetHeight;
 
 var points;
 var border;
