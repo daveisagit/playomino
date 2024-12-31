@@ -206,6 +206,10 @@ window.addEventListener('resize', function (event) {
     refresh_grid();
 });
 
+window.addEventListener('orientationchange', function (event) {
+    refresh_grid();
+});
+
 
 /*
 =========================================================================
