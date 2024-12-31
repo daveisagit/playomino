@@ -252,7 +252,7 @@ var svg = d3.select("svg"),
 
 theme = sessionStorage.getItem("theme", "light");
 if (theme == null) {
-    theme = "light";
+    theme = "dark";
 }
 set_theme();
 
