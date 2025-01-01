@@ -135,16 +135,17 @@ function set_view_box() {
 
 
 function set_theme() {
+    const svgElement = document.getElementById("gridId");
+    const btnThemeText = document.getElementById("btnThemeText");
+
     if (theme == "light") {
-        themeButton.classList.add("bx-moon");
-        themeButton.classList.remove("bx-sun");
+        btnThemeText.textContent = "dark_mode";
         document.documentElement.setAttribute("data-bs-theme", "light")
         svgElement.classList.remove("dark");
         sessionStorage.setItem("theme", "light");
     }
     else {
-        themeButton.classList.add("bx-sun");
-        themeButton.classList.remove("bx-moon");
+        btnThemeText.textContent = "light_mode";
         document.documentElement.setAttribute("data-bs-theme", "dark")
         svgElement.classList.add("dark");
         sessionStorage.setItem("theme", "dark");
@@ -167,11 +168,11 @@ Button Events
 =========================================================================
 */
 
+
 /*
 Dark Mode theme
 */
-const themeButton = document.getElementById("theme-button");
-const svgElement = document.getElementById("gridId");
+const themeButton = document.getElementById("btnTheme");
 themeButton.addEventListener("click", () => {
     if (theme == "light") {
         theme = "dark";
