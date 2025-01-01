@@ -1,11 +1,26 @@
 import * as rb from "./hex.js";
-import { evaluate } from "https://cdn.jsdelivr.net/npm/mathjs@14.0.1/+esm";
+// import { evaluate } from "https://cdn.jsdelivr.net/npm/mathjs@14.0.1/+esm";
+
+function set_shape() {
+    if (shape == null) {
+        shape = "hex";
+        var s = sessionStorage.getItem("shape");
+        if (s != null) shape = s;
+    }
+    const btn = document.getElementById("btnShapeText");
+    if (shape == "squ") {
+        btn.textContent = "square";
+    } else {
+        btn.textContent = "hexagon";
+    }
+
+}
 
 function get_points() {
     // Get points from session storage
     if (points == null) {
         const default_points = [new rb.Hex(0, 0, 0)];
-        var ps = sessionStorage.getItem("points");
+        var ps = sessionStorage.getItem(`${shape}_points`);
         if (ps == null) {
             points = default_points;
         } else {
@@ -18,7 +33,7 @@ function get_points() {
     }
 
     undo_index = points.length;
-    var ui = sessionStorage.getItem("undo_index");
+    var ui = sessionStorage.getItem(`${shape}_undo_index`);
     if (ui != null) {
         undo_index = parseInt(ui);
     }
@@ -67,8 +82,8 @@ function update_grid() {
             points.push(d);
             undo_index += 1;
             var sps = JSON.stringify(points);
-            sessionStorage.setItem("points", sps);
-            sessionStorage.setItem("undo_index", undo_index);
+            sessionStorage.setItem(`${shape}_points`, sps);
+            sessionStorage.setItem(`${shape}_undo_index`, undo_index);
             set_border();
             update_grid();
             set_view_box();
@@ -167,11 +182,26 @@ themeButton.addEventListener("click", () => {
 });
 
 /*
+Shape mode
+*/
+const shapeButton = document.getElementById("btnShape");
+shapeButton.addEventListener("click", () => {
+    if (shape == "squ") {
+        shape = "hex";
+    } else {
+        shape = "squ";
+    }
+    sessionStorage.setItem("shape", shape);
+    set_shape();
+});
+
+/*
 Clear
 */
 const clearButton = document.getElementById("btnClear");
 clearButton.addEventListener("click", () => {
-    sessionStorage.clear("points");
+    sessionStorage.removeItem(`${shape}_points`);
+    sessionStorage.removeItem(`${shape}_undo_index`);
     points = null;
     refresh_grid();
 });
@@ -183,7 +213,7 @@ const undoButton = document.getElementById("btnUndo");
 undoButton.addEventListener("click", () => {
     if (undo_index > 1) {
         undo_index -= 1;
-        sessionStorage.setItem("undo_index", undo_index);
+        sessionStorage.setItem(`${shape}_undo_index`, undo_index);
     }
     refresh_grid();
 });
@@ -196,7 +226,7 @@ const redoButton = document.getElementById("btnRedo");
 redoButton.addEventListener("click", () => {
     if (undo_index < points.length) {
         undo_index += 1;
-        sessionStorage.setItem("undo_index", undo_index);
+        sessionStorage.setItem(`${shape}_undo_index`, undo_index);
     }
     refresh_grid();
 });
@@ -224,6 +254,9 @@ var points;
 var border;
 var theme;
 var undo_index = 0;
+var shape;
+
+set_shape();
 
 /*
 Sizing and global objects
@@ -236,8 +269,6 @@ const
 let
     sz = new rb.Point(cell_size, cell_size),
     layout = new rb.Layout(rb.Layout.pointy, sz, g_origin);
-
-// console.log("result:", evaluate("sqrt(-4)").toString())
 
 d3.select("div#gridId")
     .append("svg")
