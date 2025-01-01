@@ -233,11 +233,11 @@ redoButton.addEventListener("click", () => {
 });
 
 
-window.addEventListener('resize', function (event) {
+window.addEventListener("resize", function (event) {
     refresh_grid();
 });
 
-window.addEventListener('orientationchange', function (event) {
+window.addEventListener("orientationchange", function (event) {
     refresh_grid();
 });
 
