@@ -2,7 +2,7 @@
 :root {
     /*========== Cells ==========*/
     --cell-border: lightgrey;
-    --cell-fill: lightskyblue;
+    --cell-fill: steelblue;
     --cell-stroke: black;
     --cell-stroke-width: 1;
 }
@@ -18,14 +18,25 @@
 }
 
 
+
 .cell>polygon {
     stroke: var(--cell-stroke);
     fill: var(--cell-fill);
     stroke-width: var(--cell-stroke-width);
 }
 
+.cell>circle {
+    stroke: var(--cell-stroke);
+    fill: var(--cell-stroke);
+}
+
 
 /* Dark Mode */
 div.dark .cell>polygon {
     stroke: var(--cell-border);
+}
+
+div.dark .cell>circle {
+    stroke: var(--cell-border);
+    fill: var(--cell-border);
 }

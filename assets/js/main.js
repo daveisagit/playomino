@@ -89,11 +89,23 @@ function update_grid() {
         });
     update.exit().remove();
 
-    // Points
+    // update = g_border.selectAll("circle").data(border);
+    // update.enter()
+    //     .append("circle")
+    //     .merge(update)
+    //     .attr("r", cell_size / 20)
+    //     .attr("cx", d => { return layout.hexToPixel(d).x.toFixed(0) })
+    //     .attr("cy", d => { return layout.hexToPixel(d).y.toFixed(0) });
+    // update.exit().remove();
+
+
+
+    // Points - up to the undo index
     var show_points = [];
     for (var i = 0; i < undo_index; i++) {
         show_points.push(points[i]);
     }
+
     update = g_cells.selectAll("polygon").data(show_points);
     update.enter()
         .append("polygon")
@@ -103,6 +115,15 @@ function update_grid() {
         });
     update.exit().remove();
 
+    update = g_cells.selectAll("circle").data(show_points);
+    update.enter()
+        .append("circle")
+        .merge(update)
+        .attr("r", cell_size / 20)
+        .attr("cx", d => { return layout.hexToPixel(d).x.toFixed(0) })
+        .attr("cy", d => { return layout.hexToPixel(d).y.toFixed(0) });
+    update.exit().remove();
+
 }
 
 
@@ -110,11 +131,7 @@ function set_layout() {
     const header_row = document.getElementById("headerRow");
     wdw_w = window.innerWidth;
     wdw_h = window.innerHeight - header_row.offsetHeight - 10;
-
-    const
-        cell_size = 20,
-        g_origin = new rb.Point(wdw_w / 2, wdw_h / 2);
-
+    const g_origin = new rb.Point(wdw_w / 2, wdw_h / 2);
     let sz = new rb.Point(cell_size, cell_size);
     layout = new rb.Layout(rb.Layout.pointy, sz, g_origin);
 }
@@ -254,9 +271,9 @@ redoButton.addEventListener("click", () => {
 //     refresh_grid();
 // });
 
-window.addEventListener("orientationchange", function (event) {
-    refresh_grid();
-});
+// window.addEventListener("orientationchange", function (event) {
+//     refresh_grid();
+// });
 
 
 /*
@@ -264,7 +281,7 @@ window.addEventListener("orientationchange", function (event) {
 MAIN Script
 =========================================================================
 */
-
+const cell_size = 20;
 var points;
 var border;
 var theme;
@@ -282,7 +299,7 @@ set_theme();
 set_shape();
 
 /*
-Sizing and global objects
+SVG and graphic elements
 */
 
 d3.select("div#gridId")
