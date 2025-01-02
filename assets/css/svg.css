@@ -13,11 +13,16 @@
     stroke: var(--cell-border);
 }
 
-.border>polygon:hover {
-    fill: var(--cell-border);
+/*
+@media (hover: hover) and (pointer: fine) 
+used to prevent hover selector happening on
+phones/tablets
+*/
+@media (hover: hover) and (pointer: fine) {
+    .border>polygon:hover {
+        fill: var(--cell-border);
+    }
 }
-
-
 
 .cell>polygon {
     stroke: var(--cell-stroke);
@@ -29,6 +34,7 @@
     stroke: var(--cell-stroke);
     fill: var(--cell-stroke);
 }
+
 
 
 /* Dark Mode */
