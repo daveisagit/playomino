@@ -13,7 +13,6 @@ function set_shape() {
     } else {
         btn.textContent = "hexagon";
     }
-
 }
 
 function get_points() {
@@ -107,10 +106,25 @@ function update_grid() {
 }
 
 
+function set_layout() {
+    const header_row = document.getElementById("headerRow");
+    wdw_w = window.innerWidth;
+    wdw_h = window.innerHeight - header_row.offsetHeight - 10;
+
+    const
+        cell_size = 20,
+        g_origin = new rb.Point(wdw_w / 2, wdw_h / 2);
+
+    let sz = new rb.Point(cell_size, cell_size);
+    layout = new rb.Layout(rb.Layout.pointy, sz, g_origin);
+}
+
+
 function set_view_box() {
     /*
     Keep the <g> border element central and of optimal size to fill the space
     */
+
     let box = g_border.node().getBBox();
     let wdw_r = wdw_h / wdw_w;
     let box_wdw_ratio = box.width / wdw_w;
@@ -154,6 +168,7 @@ function set_theme() {
 
 
 function refresh_grid() {
+    set_layout();
     get_points();
     set_border();
     update_grid();
@@ -193,7 +208,9 @@ shapeButton.addEventListener("click", () => {
         shape = "squ";
     }
     sessionStorage.setItem("shape", shape);
+    points = null;
     set_shape();
+    refresh_grid();
 });
 
 /*
@@ -233,9 +250,9 @@ redoButton.addEventListener("click", () => {
 });
 
 
-window.addEventListener("resize", function (event) {
-    refresh_grid();
-});
+// window.addEventListener("resize", function (event) {
+//     refresh_grid();
+// });
 
 window.addEventListener("orientationchange", function (event) {
     refresh_grid();
@@ -247,46 +264,36 @@ window.addEventListener("orientationchange", function (event) {
 MAIN Script
 =========================================================================
 */
-const header_row = document.getElementById("headerRow");
-var wdw_w = window.innerWidth;
-var wdw_h = window.innerHeight - header_row.offsetHeight;
 
 var points;
 var border;
 var theme;
 var undo_index = 0;
 var shape;
-
-set_shape();
-
-/*
-Sizing and global objects
-*/
-
-const
-    cell_size = 20,
-    g_origin = new rb.Point(wdw_w / 2, wdw_h / 2);
-
-let
-    sz = new rb.Point(cell_size, cell_size),
-    layout = new rb.Layout(rb.Layout.pointy, sz, g_origin);
-
-d3.select("div#gridId")
-    .append("svg")
-    // Responsive SVG needs these 2 attributes and no width and height attr.
-    .attr("preserveAspectRatio", "xMinYMin meet")
-    .attr("viewBox", `0 0 ${wdw_w} ${wdw_h}`)
-
-var svg = d3.select("svg"),
-    g_border = svg.append("g").classed("border", true),
-    g_cells = svg.append("g").classed("cell", true);
-
+var layout;
+var wdw_w;
+var wdw_h;
 
 theme = sessionStorage.getItem("theme", "light");
 if (theme == null) {
     theme = "dark";
 }
 set_theme();
+set_shape();
+
+/*
+Sizing and global objects
+*/
+
+d3.select("div#gridId")
+    .append("svg")
+    // Responsive SVG needs these 2 attributes and no width and height attr.
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 0 0")
+
+var svg = d3.select("svg"),
+    g_border = svg.append("g").classed("border", true),
+    g_cells = svg.append("g").classed("cell", true);
 
 /*
 !! Go !!
