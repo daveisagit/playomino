@@ -1,4 +1,4 @@
-import * as rb from "./hex.js";
+import * as poly from "./poly.js";
 // import { evaluate } from "https://cdn.jsdelivr.net/npm/mathjs@14.0.1/+esm";
 
 function set_shape() {
@@ -10,24 +10,20 @@ function set_shape() {
     const btn = document.getElementById("btnShapeText");
     if (shape == "squ") {
         btn.textContent = "square";
+        shape_class = new poly.Square();
     } else {
         btn.textContent = "hexagon";
+        shape_class = new poly.Hexagon();
     }
 }
 
 function get_points() {
     // Get points from session storage
     if (points == null) {
-        const default_points = [new rb.Hex(0, 0, 0)];
+        points = [shape_class.origin];
         var ps = sessionStorage.getItem(`${shape}_points`);
-        if (ps == null) {
-            points = default_points;
-        } else {
-            points = [];
-            ps = JSON.parse(ps);
-            for (const h of ps) {
-                points.push(new rb.Hex(h.q, h.r, h.s));
-            }
+        if (ps != null) {
+            points = JSON.parse(ps);
         }
     }
 
@@ -39,42 +35,19 @@ function get_points() {
 
 }
 
-function set_border() {
-    var point_set = new Set();
-    for (var i = 0; i < undo_index; i++) {
-        var p = point_set[p];
-        point_set.add(JSON.stringify(p));
-    }
-    var border_set = new Set();
-    for (var i = 0; i < undo_index; i++) {
-        var h = points[i];
-        for (const d of rb.Hex.directions) {
-            var b = h.add(d);
-            b = JSON.stringify(b)
-            if (!point_set.has(b)) {
-                border_set.add(b);
-            }
-        }
-    }
-    border = [];
-    for (const b of border_set) {
-        var h = JSON.parse(b);
-        border.push(new rb.Hex(h.q, h.r, h.s));
-    }
-
-}
-
 function update_grid() {
 
     var update;
 
-    // Border
+    // generate the border
+    border = shape_class.border(points, undo_index = undo_index);
+
     update = g_border.selectAll("polygon").data(border);
     update.enter()
         .append("polygon")
         .merge(update)
         .attr("points", d => {
-            return layout.polygonCorners(d).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
+            return shape_class.polygon_corners(layout, d).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
         })
         .on("click", d => {
             points.length = undo_index;
@@ -83,22 +56,10 @@ function update_grid() {
             var sps = JSON.stringify(points);
             sessionStorage.setItem(`${shape}_points`, sps);
             sessionStorage.setItem(`${shape}_undo_index`, undo_index);
-            set_border();
             update_grid();
             set_view_box();
         });
     update.exit().remove();
-
-    // update = g_border.selectAll("circle").data(border);
-    // update.enter()
-    //     .append("circle")
-    //     .merge(update)
-    //     .attr("r", cell_size / 20)
-    //     .attr("cx", d => { return layout.hexToPixel(d).x.toFixed(0) })
-    //     .attr("cy", d => { return layout.hexToPixel(d).y.toFixed(0) });
-    // update.exit().remove();
-
-
 
     // Points - up to the undo index
     var show_points = [];
@@ -111,7 +72,7 @@ function update_grid() {
         .append("polygon")
         .merge(update)
         .attr("points", d => {
-            return layout.polygonCorners(d).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
+            return shape_class.polygon_corners(layout, d).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
         });
     update.exit().remove();
 
@@ -120,8 +81,9 @@ function update_grid() {
         .append("circle")
         .merge(update)
         .attr("r", cell_size / 20)
-        .attr("cx", d => { return layout.hexToPixel(d).x.toFixed(0) })
-        .attr("cy", d => { return layout.hexToPixel(d).y.toFixed(0) });
+        .attr("cx", d => { return shape_class.to_pixel(layout, d).x.toFixed(0) })
+        .attr("cy", d => { return shape_class.to_pixel(layout, d).y.toFixed(0) });
+
     update.exit().remove();
 
 }
@@ -131,9 +93,9 @@ function set_layout() {
     const header_row = document.getElementById("headerRow");
     wdw_w = window.innerWidth;
     wdw_h = window.innerHeight - header_row.offsetHeight - 10;
-    const g_origin = new rb.Point(wdw_w / 2, wdw_h / 2);
-    let sz = new rb.Point(cell_size, cell_size);
-    layout = new rb.Layout(rb.Layout.pointy, sz, g_origin);
+    const g_origin = new poly.Point(wdw_w / 2, wdw_h / 2);
+    let sz = new poly.Point(cell_size, cell_size);
+    layout = new poly.Layout(sz, g_origin);
 }
 
 
@@ -187,7 +149,6 @@ function set_theme() {
 function refresh_grid() {
     set_layout();
     get_points();
-    set_border();
     update_grid();
     set_view_box();
 }
@@ -267,15 +228,6 @@ redoButton.addEventListener("click", () => {
 });
 
 
-// window.addEventListener("resize", function (event) {
-//     refresh_grid();
-// });
-
-// window.addEventListener("orientationchange", function (event) {
-//     refresh_grid();
-// });
-
-
 /*
 =========================================================================
 MAIN Script
@@ -290,6 +242,7 @@ var shape;
 var layout;
 var wdw_w;
 var wdw_h;
+var shape_class;
 
 theme = sessionStorage.getItem("theme", "light");
 if (theme == null) {
