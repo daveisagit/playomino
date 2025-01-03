@@ -33,7 +33,7 @@ class Shape {
         for (const dv of this.directions) {
             var n = p.map(function (v, i) {
                 return v + dv[i];
-            })
+            });
             res.push(n);
         }
         return res;

@@ -81,13 +81,18 @@ function update_grid() {
             return shape_class.polygon_corners(layout, d).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
         })
         .on("click", d => {
-            points.length = undo_index;
-            points.push(d);
-            undo_index += 1;
-            var sps = JSON.stringify(points);
-            sessionStorage.setItem(`${shape}_points`, sps);
-            sessionStorage.setItem(`${shape}_undo_index`, undo_index);
-            refresh_ui();
+
+            var cp = find_collinear(d);
+            if (cp == null) {
+                points.length = undo_index;
+                points.push(d);
+                undo_index += 1;
+                var sps = JSON.stringify(points);
+                sessionStorage.setItem(`${shape}_points`, sps);
+                sessionStorage.setItem(`${shape}_undo_index`, undo_index);
+                refresh_ui();
+            }
+
         });
     update.exit().remove();
 
@@ -190,7 +195,45 @@ function refresh_grid() {
     refresh_ui();
 }
 
-function find_collinear(p) {
+function find_collinear(np) {
+
+    var vectors = [];
+    for (var i = 0; i < undo_index; i++) {
+        var p = points[i];
+        const vec = p.map(function (v, j) { return v - np[j] })
+        vectors.push(vec);
+    }
+
+    // build a dict of sets, each set is a set of parallel vectors
+    const orthogonal = {};
+    for (const v of vectors) {
+        let new_value = true;
+        for (const k in orthogonal) {
+            var o = JSON.parse(k);
+            if (mtx.are_parallel(v, o)) {
+                var kv = JSON.stringify(v);
+                orthogonal[k].add(kv);
+                // if (at_least && orthogonal[o].size >= at_least) {
+                //     return at_least + 1;
+                // }                
+                new_value = false;
+                break;
+            }
+        }
+        if (new_value) {
+            var kv = JSON.stringify(v);
+            orthogonal[JSON.stringify(v)] = new Set([kv]);
+        }
+    }
+
+    for (const k in orthogonal) {
+        o = orthogonal[k];
+        if (o.size > collinearity - 1) {
+            return Array.from(o);
+        }
+    }
+
+    return null;
 
 }
 
@@ -268,8 +311,8 @@ setCollinearityButton.addEventListener("click", () => {
     var v = collinearChoices.querySelector("[name=collinear-options]:checked").getAttribute("value");
     var modal = bootstrap.Modal.getInstance(modalElement)
     modal.hide();
-    maxCollinear.textContent = v;
-    sessionStorage.setItem(`${shape}_collinearity`, v);
+    collinearity = parseInt(v);
+    set_collinearity();
 });
 
 /*
