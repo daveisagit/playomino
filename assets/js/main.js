@@ -173,6 +173,8 @@ function set_theme() {
 
 function set_header() {
     sizeElement.textContent = undo_index.toFixed(0);
+    undoButton.disabled = (undo_index == 1);
+    redoButton.disabled = (undo_index == points.length);
 }
 
 function refresh_ui() {
@@ -312,5 +314,14 @@ var svg = d3.select("svg"),
 /*
 !! Go !!
 */
+
+var seenWelcome = sessionStorage.getItem("seenWelcome");
+if (seenWelcome == null) {
+    sessionStorage.setItem("seenWelcome", true);
+    document.getElementById("help").classList.add("show")
+}
+
+
+
 refresh_grid();
 

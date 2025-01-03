@@ -46,3 +46,7 @@ div.dark .cell>circle {
     stroke: var(--cell-border);
     fill: var(--cell-border);
 }
+
+.btn:disabled {
+    border: none;
+}
