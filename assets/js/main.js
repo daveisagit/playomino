@@ -2,11 +2,23 @@ import * as poly from "./poly.js";
 import * as mtx from "./matrix.js";
 // import { evaluate } from "https://cdn.jsdelivr.net/npm/mathjs@14.0.1/+esm";
 
+/*
+DOM elements
+*/
+const svgElement = document.getElementById("gridId");
+const btnThemeText = document.getElementById("btnThemeText");
+const header_row = document.getElementById("headerRow");
 const themeButton = document.getElementById("btnTheme");
 const shapeButton = document.getElementById("btnShape");
 const clearButton = document.getElementById("btnClear");
 const undoButton = document.getElementById("btnUndo");
 const redoButton = document.getElementById("btnRedo");
+const setCollinearityButton = document.getElementById("btnSetCollinearity");
+const sizeElement = document.getElementById("sizeId");
+const shapeText = document.getElementById("btnShapeText");
+const collinearChoices = document.getElementById("collinearChoice");
+const maxCollinear = document.getElementById("maxCollinear");
+const modalElement = document.getElementById('collinearModal');
 
 function set_shape() {
     if (shape == null) {
@@ -14,12 +26,11 @@ function set_shape() {
         var s = sessionStorage.getItem("shape");
         if (s != null) shape = s;
     }
-    const btn = document.getElementById("btnShapeText");
     if (shape == "squ") {
-        btn.textContent = "square";
+        shapeText.textContent = "square";
         shape_class = new poly.Square();
     } else {
-        btn.textContent = "hexagon";
+        shapeText.textContent = "hexagon";
         shape_class = new poly.Hexagon();
     }
 }
@@ -96,7 +107,6 @@ function update_grid() {
 
 
 function set_layout() {
-    const header_row = document.getElementById("headerRow");
     wdw_w = window.innerWidth;
     wdw_h = window.innerHeight - header_row.offsetHeight - 10;
     const g_origin = new poly.Point(wdw_w / 2, wdw_h / 2);
@@ -134,9 +144,6 @@ function set_view_box() {
 
 
 function set_theme() {
-    const svgElement = document.getElementById("gridId");
-    const btnThemeText = document.getElementById("btnThemeText");
-
     if (theme == "light") {
         btnThemeText.textContent = "dark_mode";
         document.documentElement.setAttribute("data-bs-theme", "light")
@@ -152,7 +159,6 @@ function set_theme() {
 }
 
 function set_header() {
-    const sizeElement = document.getElementById("sizeId");
     sizeElement.textContent = undo_index.toFixed(0);
 }
 
@@ -240,6 +246,15 @@ redoButton.addEventListener("click", () => {
     refresh_grid();
 });
 
+/*
+Collinearity
+*/
+setCollinearityButton.addEventListener("click", () => {
+    var v = collinearChoices.querySelector("[name=collinear-options]:checked").getAttribute("value");
+    var modal = bootstrap.Modal.getInstance(modalElement)
+    modal.hide();
+    maxCollinear.textContent = v;
+});
 
 /*
 =========================================================================

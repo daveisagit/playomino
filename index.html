@@ -27,8 +27,8 @@
 <body>
     <!--========== HEADER ==========-->
     <div class="container-fluid text-center">
-        <div class="py-2 row" id="headerRow">
-            <div class="col-10 text-start">
+        <div class="py-2 d-flex flex-row" id="headerRow">
+            <div class="flex-grow-1 text-start">
                 <button type="button" class="btn btn-sm" id="btnShape"
                     title="Toggle Polyomino shape between square and hexagon">
                     <span class="material-symbols-outlined interests__icon" id="btnShapeText">square</span>
@@ -39,12 +39,58 @@
                 <button type="button" class="btn btn-sm" id="btnUndo" title="Undo">
                     <span class="material-symbols-outlined interests__icon">undo</span>
                 </button>
-                <span id="sizeId">5</span>
+                <span class="badge bg-secondary" id="sizeId">5</span>
                 <button type="button" class="btn btn-sm" id="btnRedo" title="Redo">
                     <span class="material-symbols-outlined interests__icon">redo</span>
                 </button>
+
+                <button type="button" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#collinearModal">
+                    <div class="d-flex">
+                        <span class="material-symbols-outlined">more_vert</span>
+                        <span class="align-middle" id="maxCollinear">3</span>
+                    </div>
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="collinearModal" tabindex="-1" aria-labelledby="collinearModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="collinearModalLabel">Change the Collinearity Limit</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" id="collinearChoice">
+                                <p>Set the limit on the maximum number of collinear cells allowed.</p>
+                                <input type="radio" class="btn-check" name="collinear-options" id="co1"
+                                    autocomplete="off" value="1">
+                                <label class="btn" for="co1">1</label>
+                                <input type="radio" class="btn-check" name="collinear-options" id="co2"
+                                    autocomplete="off" value="2">
+                                <label class="btn" for="co2">2</label>
+                                <input type="radio" class="btn-check" name="collinear-options" id="co3"
+                                    autocomplete="off" value="3" checked>
+                                <label class="btn" for="co3">3</label>
+                                <input type="radio" class="btn-check" name="collinear-options" id="co4"
+                                    autocomplete="off" value="4">
+                                <label class="btn" for="co4">4</label>
+                                <input type="radio" class="btn-check" name="collinear-options" id="co5"
+                                    autocomplete="off" value="5">
+                                <label class="btn" for="co5">5</label>
+                                <p>Reducing this value may mean your current shape becomes invalid.</p>
+                                <p>If this happens then we will undo/backtrack to the largest valid size.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="btnSetCollinearity">Set</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-            <div class="col-2 text-end">
+            <div class="text-end">
                 <button type="button" class="btn btn-sm" id="btnTheme" title="Theme Light/Dark mode">
                     <span class="material-symbols-outlined interests__icon" id="btnThemeText">light_mode</span>
                 </button>
