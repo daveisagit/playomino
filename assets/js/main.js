@@ -33,6 +33,20 @@ function set_shape() {
         shapeText.textContent = "hexagon";
         shape_class = new poly.Hexagon();
     }
+
+    collinearity = null;
+    set_collinearity();
+
+}
+
+function set_collinearity() {
+    if (collinearity == null) {
+        collinearity = 3;
+        var s = sessionStorage.getItem(`${shape}_collinearity`);
+        if (s != null) collinearity = parseInt(s);
+    }
+    maxCollinear.textContent = collinearity.toString();
+    document.getElementById(`co${collinearity}`).checked = true;
 }
 
 function get_points() {
@@ -254,6 +268,7 @@ setCollinearityButton.addEventListener("click", () => {
     var modal = bootstrap.Modal.getInstance(modalElement)
     modal.hide();
     maxCollinear.textContent = v;
+    sessionStorage.setItem(`${shape}_collinearity`, v);
 });
 
 /*
@@ -271,6 +286,7 @@ var layout;
 var wdw_w;
 var wdw_h;
 var shape_class;
+var collinearity;
 
 theme = sessionStorage.getItem("theme", "light");
 if (theme == null) {
@@ -278,6 +294,7 @@ if (theme == null) {
 }
 set_theme();
 set_shape();
+set_collinearity();
 
 /*
 SVG and graphic elements
