@@ -1,5 +1,12 @@
 import * as poly from "./poly.js";
+import * as mtx from "./matrix.js";
 // import { evaluate } from "https://cdn.jsdelivr.net/npm/mathjs@14.0.1/+esm";
+
+const themeButton = document.getElementById("btnTheme");
+const shapeButton = document.getElementById("btnShape");
+const clearButton = document.getElementById("btnClear");
+const undoButton = document.getElementById("btnUndo");
+const redoButton = document.getElementById("btnRedo");
 
 function set_shape() {
     if (shape == null) {
@@ -56,8 +63,7 @@ function update_grid() {
             var sps = JSON.stringify(points);
             sessionStorage.setItem(`${shape}_points`, sps);
             sessionStorage.setItem(`${shape}_undo_index`, undo_index);
-            update_grid();
-            set_view_box();
+            refresh_ui();
         });
     update.exit().remove();
 
@@ -145,14 +151,27 @@ function set_theme() {
     }
 }
 
+function set_header() {
+    const sizeElement = document.getElementById("sizeId");
+    sizeElement.textContent = undo_index.toFixed(0);
+}
+
+function refresh_ui() {
+    update_grid();
+    set_header();
+    set_view_box();
+}
+
 
 function refresh_grid() {
     set_layout();
     get_points();
-    update_grid();
-    set_view_box();
+    refresh_ui();
 }
 
+function find_collinear(p) {
+
+}
 
 
 /*
@@ -164,7 +183,6 @@ Button Events
 /*
 Dark Mode theme
 */
-const themeButton = document.getElementById("btnTheme");
 themeButton.addEventListener("click", () => {
     if (theme == "light") {
         theme = "dark";
@@ -177,7 +195,6 @@ themeButton.addEventListener("click", () => {
 /*
 Shape mode
 */
-const shapeButton = document.getElementById("btnShape");
 shapeButton.addEventListener("click", () => {
     if (shape == "squ") {
         shape = "hex";
@@ -193,7 +210,6 @@ shapeButton.addEventListener("click", () => {
 /*
 Clear
 */
-const clearButton = document.getElementById("btnClear");
 clearButton.addEventListener("click", () => {
     sessionStorage.removeItem(`${shape}_points`);
     sessionStorage.removeItem(`${shape}_undo_index`);
@@ -204,7 +220,6 @@ clearButton.addEventListener("click", () => {
 /*
 Undo
 */
-const undoButton = document.getElementById("btnUndo");
 undoButton.addEventListener("click", () => {
     if (undo_index > 1) {
         undo_index -= 1;
@@ -217,7 +232,6 @@ undoButton.addEventListener("click", () => {
 /*
 Redo
 */
-const redoButton = document.getElementById("btnRedo");
 redoButton.addEventListener("click", () => {
     if (undo_index < points.length) {
         undo_index += 1;
