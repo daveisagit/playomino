@@ -46,7 +46,7 @@
                 </button>
 
                 <button type="button" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#collinearModal"
-                    title="The collinearity limit">
+                    title="Change the collinearity limit">
                     <div class="d-flex">
                         <span class="material-symbols-outlined">more_vert</span>
                         <span class="align-middle" id="maxCollinear">3</span>
@@ -95,10 +95,115 @@
 
             </div>
             <div class="text-end">
+                <button type="button" class="btn btn-sm" data-bs-toggle="collapse" data-bs-target="#help"
+                    aria-expanded="false" aria-controls="collapseHelp" title="Help / About">
+                    <span class="material-symbols-outlined interests__icon">help</span>
+                </button>
                 <button type="button" class="btn btn-sm" id="btnTheme" title="Theme Light/Dark mode">
                     <span class="material-symbols-outlined interests__icon" id="btnThemeText">light_mode</span>
                 </button>
             </div>
+        </div>
+
+
+        <div class="collapse" id="help">
+            <div class="mb-4 d-flex justify-content-between">
+                <div></div>
+                <div>
+                    <h1 class="my-2">Polyomino Collinearity Explorer</h1>
+                    <div class="my-4">
+                        <span class="align-middle">Have fun creating square</span>
+                        <span class="align-middle material-symbols-outlined interests__icon">square</span>
+                        <span class="align-middle">and hexagonal</span>
+                        <span class="align-middle material-symbols-outlined interests__icon">hexagon</span>
+                        <span class="align-middle">polyominoes</span>
+                    </div>
+                    <strong>However, there is a restriction! You can not go over the <i>collinearity</i> limit.</strong>
+                    <p class="my-2">This is the maximum number of cell centres that are allowed to be collinear on any
+                        line in the plane.</p>
+                    <p class="my-2">By default the <i>collinearity</i> limit = 3, but you can change it to whatever you
+                        like between 1 and 5.</p>
+
+
+                    <div>
+                        <h3 class="my-4">Instruction Manual</h3>
+                        <i class="h5">Every great polyomino journey starts with a first cell...</i>
+                        <p class="my-3">Click on the empty bordering cells to expand your polyomino and see how far you
+                            can get
+                            before the collinearity limit stops you going any further.</p>
+                        <div>
+                            <table class="table table-borderless text-start">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span class="material-symbols-outlined interests__icon"
+                                                id="btnShapeText">square</span>
+                                            <span class="material-symbols-outlined interests__icon"
+                                                id="btnShapeText">hexagon</span>
+                                        </td>
+                                        <td>Toggle between square and hexagonal polyominoes.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="material-symbols-outlined interests__icon">mop</span>
+                                        </td>
+                                        <td>Sweep away this rubbish and start again.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="material-symbols-outlined interests__icon">undo</span>
+                                            <span class="material-symbols-outlined interests__icon">redo</span>
+                                        </td>
+                                        <td>Undo and Redo</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h5 class="d-inline"><span class="badge bg-secondary">n</span></h5>
+                                        </td>
+                                        <td>Size of polyomino.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex">
+                                                <span class="material-symbols-outlined">more_vert</span>
+                                                <span class="align-middle" id="maxCollinear">3</span>
+                                            </div>
+                                        </td>
+                                        <td>Change the collinearity limit.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex">
+                                                <span class="material-symbols-outlined interests__icon"
+                                                    id="btnThemeText">light_mode</span>
+                                                <span class="material-symbols-outlined interests__icon"
+                                                    id="btnThemeText">dark_mode</span>
+                                            </div>
+                                        </td>
+                                        <td>Toggle the light/dark theme.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="my-4">
+                                <span class="align-middle">Click the close or </span>
+                                <span class="align-middle material-symbols-outlined interests__icon"
+                                    id="btnThemeText">help</span>
+                                <span class="align-middle">button to be rid of this guff.</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="text-end">
+                    <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#help"
+                        aria-label="Close"></button>
+                </div>
+
+            </div>
+
         </div>
 
         <!-- Render the grid layout in this div-->

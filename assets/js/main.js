@@ -1,6 +1,5 @@
 import * as poly from "./poly.js";
 import * as mtx from "./matrix.js";
-// import { evaluate } from "https://cdn.jsdelivr.net/npm/mathjs@14.0.1/+esm";
 
 /*
 DOM elements
