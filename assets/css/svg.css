@@ -26,8 +26,9 @@
 
 /* border */
 .border>polygon {
-    stroke: var(--cell-stroke-light);
-    fill-opacity: 25%;
+    /* stroke: var(--cell-stroke-light); */
+    stroke: none;
+    fill-opacity: 20%;
     fill: var(--cell-border-valid);
 }
 
@@ -57,9 +58,9 @@ div.dark .cell>polygon {
     stroke: var(--cell-stroke-dark);
 }
 
-div.dark .border>polygon {
+/* div.dark .border>polygon {
     stroke: var(--cell-stroke-dark);
-}
+} */
 
 div.dark .cell>circle {
     stroke: var(--cell-stroke-dark);
