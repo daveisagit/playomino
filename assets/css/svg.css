@@ -8,6 +8,8 @@
     --cell-stroke-light: black;
     --cell-stroke-dark: lightgrey;
     --cell-stroke-width: 1;
+    --line-stroke: crimson;
+    --line-stroke-width: 2;
 }
 
 
@@ -30,7 +32,6 @@
 }
 
 
-
 /* border */
 .border>polygon {
     /* stroke: var(--cell-stroke-light); */
@@ -45,7 +46,7 @@
 
 .border>polygon.collinear {
     fill: var(--cell-point-collinear);
-    fill-opacity: 1;
+    fill-opacity: 50%;
 }
 
 /*
@@ -66,6 +67,11 @@ phones/tablets
 }
 
 
+line {
+    stroke: var(--line-stroke);
+    stroke-width: var(--line-stroke-width);
+    stroke-linecap: round;
+}
 
 
 /* Dark Mode for outline and dot */

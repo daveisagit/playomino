@@ -107,6 +107,8 @@ function update_grid() {
                     var sps = JSON.stringify(points);
                     sessionStorage.setItem(`${shape}_points`, sps);
                     sessionStorage.setItem(`${shape}_undo_index`, undo_index);
+                } else {
+                    set_collinear_line();
                 }
 
             }
@@ -140,11 +142,26 @@ function update_grid() {
     update.enter()
         .append("circle")
         .merge(update)
-        .attr("r", cell_size / 20)
+        .attr("r", cell_size / 10)
         .attr("cx", d => { return shape_class.to_pixel(layout, d).x.toFixed(0) })
         .attr("cy", d => { return shape_class.to_pixel(layout, d).y.toFixed(0) });
 
     update.exit().remove();
+
+    // add the line
+    if (collinear_points == null) {
+        collinear_line = [];
+    }
+    update = g_cells.selectAll("line").data(collinear_line);
+    update.enter()
+        .append("line")
+        .merge(update)
+        .attr("x1", d => { return shape_class.to_pixel(layout, d[0]).x.toFixed(0) })
+        .attr("y1", d => { return shape_class.to_pixel(layout, d[0]).y.toFixed(0) })
+        .attr("x2", d => { return shape_class.to_pixel(layout, d[1]).x.toFixed(0) })
+        .attr("y2", d => { return shape_class.to_pixel(layout, d[1]).y.toFixed(0) });
+    update.exit().remove();
+
 
 }
 
@@ -256,7 +273,7 @@ function find_collinear(np) {
         o = orthogonal[k];
         if (o.size > collinearity - 1) {
             vectors = Array.from(o);
-            var co_points = [np];
+            var co_points = [JSON.stringify(np)];
             for (const vs of vectors) {
                 var vec = JSON.parse(vs);
                 var p = vec.map(function (v, j) { return v + np[j] })
@@ -281,6 +298,26 @@ function backtrack() {
         undo_index += 1;
     }
     sessionStorage.setItem(`${shape}_undo_index`, undo_index);
+}
+
+function set_collinear_line() {
+    var cps = [];
+    var arr = Array.from(collinear_points);
+    for (const p of arr) {
+        cps.push(JSON.parse(p));
+    }
+    var max_d = 0;
+    for (var i = 0; i < cps.length; i++) {
+        for (var j = i + 1; j < cps.length; j++) {
+            var p = cps[i];
+            var q = cps[j];
+            var d = shape_class.manhattan(p, q);
+            if (d > max_d) {
+                collinear_line = [[p, q]];
+                max_d = d;
+            }
+        }
+    }
 }
 
 
@@ -313,6 +350,8 @@ shapeButton.addEventListener("click", () => {
     }
     sessionStorage.setItem("shape", shape);
     points = null;
+    collinear_points = null;
+    last_border_cell_selected = null;
     set_shape();
     refresh_grid();
 });
@@ -394,6 +433,7 @@ var shape_class;
 var collinearity;
 var collinear_points;
 var last_border_cell_selected;
+var collinear_line;
 
 theme = sessionStorage.getItem("theme", "light");
 if (theme == null) {

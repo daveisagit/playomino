@@ -95,6 +95,9 @@ export class Hexagon extends Shape {
         var y = (3 * h[1] / 2) * size.y;
         return new Point(x + origin.x, y + origin.y);
     }
+    manhattan(p, q) {
+        return (Math.abs(p[0] - q[0]) + Math.abs(p[1] - q[1]) + Math.abs(p[2] - q[2])) / 2;
+    }
 }
 
 export class Square extends Shape {
@@ -116,4 +119,8 @@ export class Square extends Shape {
         var y = r2 * h[1] * size.y;
         return new Point(x + origin.x, y + origin.y);
     }
+    manhattan(p, q) {
+        return Math.abs(p[0] - q[0]) + Math.abs(p[1] - q[1]);
+    }
+
 }
