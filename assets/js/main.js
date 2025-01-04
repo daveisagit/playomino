@@ -363,6 +363,8 @@ clearButton.addEventListener("click", () => {
     sessionStorage.removeItem(`${shape}_points`);
     sessionStorage.removeItem(`${shape}_undo_index`);
     points = null;
+    collinear_points = null;
+    last_border_cell_selected = null;
     refresh_grid();
 });
 
