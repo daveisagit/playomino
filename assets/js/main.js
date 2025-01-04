@@ -17,7 +17,8 @@ const sizeElement = document.getElementById("sizeId");
 const shapeText = document.getElementById("btnShapeText");
 const collinearChoices = document.getElementById("collinearChoice");
 const maxCollinear = document.getElementById("maxCollinear");
-const modalElement = document.getElementById('collinearModal');
+const collinearModal = document.getElementById("collinearModal");
+const welcomeModal = document.getElementById("welcomeModal");
 
 function set_shape() {
     if (shape == null) {
@@ -340,7 +341,7 @@ Collinearity
 */
 setCollinearityButton.addEventListener("click", () => {
     var v = collinearChoices.querySelector("[name=collinear-options]:checked").getAttribute("value");
-    var modal = bootstrap.Modal.getInstance(modalElement)
+    var modal = bootstrap.Modal.getInstance(collinearModal)
     modal.hide();
     sessionStorage.setItem(`${shape}_collinearity`, v);
     collinearity = null;
@@ -393,13 +394,12 @@ var svg = d3.select("svg"),
 !! Go !!
 */
 
-var seenWelcome = sessionStorage.getItem("seenWelcome");
+var seenWelcome = localStorage.getItem("seenWelcome");
 if (seenWelcome == null) {
-    sessionStorage.setItem("seenWelcome", true);
-    document.getElementById("help").classList.add("show")
+    localStorage.setItem("seenWelcome", true);
+    var modal = new bootstrap.Modal(welcomeModal);
+    modal.show();
 }
-
-
 
 refresh_grid();
 
