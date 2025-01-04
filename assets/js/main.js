@@ -87,7 +87,7 @@ function update_grid() {
         })
         .classed("collinear", d => {
             if (collinear_points == null) return false;
-            if (JSON.stringify(last_border_cell_clicked) == JSON.stringify(d)) return true;
+            if (JSON.stringify(last_border_cell_selected) == JSON.stringify(d)) return true;
             return false;
         })
         .attr("points", d => {
@@ -95,10 +95,10 @@ function update_grid() {
         })
         .on("click", d => {
 
-            if (collinear_points != null && JSON.stringify(last_border_cell_clicked) == JSON.stringify(d)) {
+            if (collinear_points != null && JSON.stringify(last_border_cell_selected) == JSON.stringify(d)) {
                 collinear_points = null;
             } else {
-                last_border_cell_clicked = d;
+                last_border_cell_selected = d;
                 collinear_points = find_collinear(d);
                 if (collinear_points == null) {
                     points.length = undo_index;
@@ -217,6 +217,7 @@ function refresh_ui() {
 function refresh_grid() {
     set_layout();
     get_points();
+    backtrack();
     refresh_ui();
 }
 
@@ -267,6 +268,19 @@ function find_collinear(np) {
 
     return null;
 
+}
+
+function backtrack() {
+    // backtrack as needed to stay within the collinearity
+    var i_limit = undo_index;
+    for (var i = 1; i < i_limit; i++) {
+        undo_index = i;
+        var p = points[undo_index];
+        var cp = find_collinear(p);
+        if (cp != null) break;
+        undo_index += 1;
+    }
+    sessionStorage.setItem(`${shape}_undo_index`, undo_index);
 }
 
 
@@ -320,6 +334,9 @@ undoButton.addEventListener("click", () => {
     if (undo_index > 1) {
         undo_index -= 1;
         sessionStorage.setItem(`${shape}_undo_index`, undo_index);
+        collinear_points = null;
+        last_border_cell_selected = null;
+
     }
     refresh_grid();
 });
@@ -330,8 +347,13 @@ Redo
 */
 redoButton.addEventListener("click", () => {
     if (undo_index < points.length) {
-        undo_index += 1;
-        sessionStorage.setItem(`${shape}_undo_index`, undo_index);
+        last_border_cell_selected = points[undo_index]
+        collinear_points = find_collinear(last_border_cell_selected);
+
+        if (collinear_points == null) {
+            undo_index += 1;
+            sessionStorage.setItem(`${shape}_undo_index`, undo_index);
+        }
     }
     refresh_grid();
 });
@@ -343,9 +365,14 @@ setCollinearityButton.addEventListener("click", () => {
     var v = collinearChoices.querySelector("[name=collinear-options]:checked").getAttribute("value");
     var modal = bootstrap.Modal.getInstance(collinearModal)
     modal.hide();
+
     sessionStorage.setItem(`${shape}_collinearity`, v);
     collinearity = null;
     set_collinearity();
+
+    collinear_points = null;
+    last_border_cell_selected = null;
+
     refresh_grid();
 });
 
@@ -366,7 +393,7 @@ var wdw_h;
 var shape_class;
 var collinearity;
 var collinear_points;
-var last_border_cell_clicked;
+var last_border_cell_selected;
 
 theme = sessionStorage.getItem("theme", "light");
 if (theme == null) {
