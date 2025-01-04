@@ -375,7 +375,6 @@ undoButton.addEventListener("click", () => {
         sessionStorage.setItem(`${shape}_undo_index`, undo_index);
         collinear_points = null;
         last_border_cell_selected = null;
-
     }
     refresh_grid();
 });
@@ -388,10 +387,11 @@ redoButton.addEventListener("click", () => {
     if (undo_index < points.length) {
         last_border_cell_selected = points[undo_index]
         collinear_points = find_collinear(last_border_cell_selected);
-
         if (collinear_points == null) {
             undo_index += 1;
             sessionStorage.setItem(`${shape}_undo_index`, undo_index);
+        } else {
+            set_collinear_line();
         }
     }
     refresh_grid();
