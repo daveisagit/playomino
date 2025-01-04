@@ -84,21 +84,32 @@ function update_grid() {
             }
             return true;
         })
+        .classed("collinear", d => {
+            if (collinear_points == null) return false;
+            if (JSON.stringify(last_border_cell_clicked) == JSON.stringify(d)) return true;
+            return false;
+        })
         .attr("points", d => {
             return shape_class.polygon_corners(layout, d).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
         })
         .on("click", d => {
 
-            collinear_points = find_collinear(d);
-            if (collinear_points == null) {
-                points.length = undo_index;
-                points.push(d);
-                undo_index += 1;
-                var sps = JSON.stringify(points);
-                sessionStorage.setItem(`${shape}_points`, sps);
-                sessionStorage.setItem(`${shape}_undo_index`, undo_index);
-                refresh_ui();
+            if (collinear_points != null && JSON.stringify(last_border_cell_clicked) == JSON.stringify(d)) {
+                collinear_points = null;
+            } else {
+                last_border_cell_clicked = d;
+                collinear_points = find_collinear(d);
+                if (collinear_points == null) {
+                    points.length = undo_index;
+                    points.push(d);
+                    undo_index += 1;
+                    var sps = JSON.stringify(points);
+                    sessionStorage.setItem(`${shape}_points`, sps);
+                    sessionStorage.setItem(`${shape}_undo_index`, undo_index);
+                }
+
             }
+            refresh_ui();
 
         });
     update.exit().remove();
@@ -113,6 +124,12 @@ function update_grid() {
     update.enter()
         .append("polygon")
         .merge(update)
+        .classed("collinear", d => {
+            if (collinear_points == null) return false;
+            if (collinear_points.has(JSON.stringify(d))) {
+                return true;
+            }
+        })
         .attr("points", d => {
             return shape_class.polygon_corners(layout, d).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
         });
@@ -241,9 +258,9 @@ function find_collinear(np) {
             for (const vs of vectors) {
                 var vec = JSON.parse(vs);
                 var p = vec.map(function (v, j) { return v + np[j] })
-                co_points.push(p);
+                co_points.push(JSON.stringify(p));
             }
-            return co_points
+            return new Set(co_points);
         }
     }
 
@@ -348,6 +365,7 @@ var wdw_h;
 var shape_class;
 var collinearity;
 var collinear_points;
+var last_border_cell_clicked;
 
 theme = sessionStorage.getItem("theme", "light");
 if (theme == null) {
