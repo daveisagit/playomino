@@ -1,5 +1,7 @@
 export function are_parallel(u, v) {
-    return matrix_rank([u, v]) <= 1;
+    var cu = Array.from(u);
+    var cv = Array.from(v);
+    return matrix_rank([cu, cv]) <= 1;
 }
 
 function matrix_rank(matrix) {
@@ -36,20 +38,3 @@ function matrix_rank(matrix) {
 
     return rank;
 }
-
-
-// var mtx = [
-//     [-4, 1, 3], [-3, 1, 2]
-// ]
-// console.log(rank(mtx));
-
-// var mtx = [
-//     [-4, 1, 3], [8, -2, -6]
-// ]
-// console.log(rank(mtx));
-
-
-// mtx = [
-//     [1, 3], [2, 6]
-// ]
-// console.log(rank(mtx));

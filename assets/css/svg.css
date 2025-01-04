@@ -1,16 +1,38 @@
 /*===== VARIABLES CSS =====*/
 :root {
     /*========== Cells ==========*/
-    --cell-border: lightgrey;
-    --cell-fill: steelblue;
-    --cell-stroke: black;
+    --cell-point-fill: steelblue;
+    --cell-border-valid: green;
+    --cell-border-invalid: firebrick;
+    --cell-stroke-light: black;
+    --cell-stroke-dark: lightgrey;
     --cell-stroke-width: 1;
 }
 
 
+
+
+/* points */
+.cell>polygon {
+    stroke: var(--cell-stroke-light);
+    fill: var(--cell-point-fill);
+    stroke-width: var(--cell-stroke-width);
+}
+
+.cell>circle {
+    stroke: var(--cell-stroke-light);
+    fill: var(--cell-stroke-light);
+}
+
+/* border */
 .border>polygon {
-    fill: transparent;
-    stroke: var(--cell-border);
+    stroke: var(--cell-stroke-light);
+    fill-opacity: 25%;
+    fill: var(--cell-border-valid);
+}
+
+.border>polygon.invalid {
+    fill: var(--cell-border-invalid);
 }
 
 /*
@@ -19,34 +41,32 @@ used to prevent hover selector happening on
 phones/tablets
 */
 @media (hover: hover) and (pointer: fine) {
+    .border>polygon.invalid:hover {
+        /* fill: var(--cell-border); */
+        fill-opacity: 1;
+    }
+
     .border>polygon:hover {
-        fill: var(--cell-border);
+        /* fill: var(--cell-border); */
+        fill-opacity: 1;
     }
 }
 
-.cell>polygon {
-    stroke: var(--cell-stroke);
-    fill: var(--cell-fill);
-    stroke-width: var(--cell-stroke-width);
-}
-
-.cell>circle {
-    stroke: var(--cell-stroke);
-    fill: var(--cell-stroke);
-}
-
-
-
-/* Dark Mode */
+/* Dark Mode for outline and dot */
 div.dark .cell>polygon {
-    stroke: var(--cell-border);
+    stroke: var(--cell-stroke-dark);
+}
+
+div.dark .border>polygon {
+    stroke: var(--cell-stroke-dark);
 }
 
 div.dark .cell>circle {
-    stroke: var(--cell-border);
-    fill: var(--cell-border);
+    stroke: var(--cell-stroke-dark);
+    fill: var(--cell-stroke-dark);
 }
 
+/* stop Bootstrap oddness after click */
 .btn:disabled {
     border: none;
 }

@@ -77,13 +77,20 @@ function update_grid() {
     update.enter()
         .append("polygon")
         .merge(update)
+        .classed("invalid", d => {
+            var cp = find_collinear(d);
+            if (cp == null) {
+                return false;
+            }
+            return true;
+        })
         .attr("points", d => {
             return shape_class.polygon_corners(layout, d).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
         })
         .on("click", d => {
 
-            var cp = find_collinear(d);
-            if (cp == null) {
+            collinear_points = find_collinear(d);
+            if (collinear_points == null) {
                 points.length = undo_index;
                 points.push(d);
                 undo_index += 1;
@@ -229,7 +236,14 @@ function find_collinear(np) {
     for (const k in orthogonal) {
         o = orthogonal[k];
         if (o.size > collinearity - 1) {
-            return Array.from(o);
+            vectors = Array.from(o);
+            var co_points = [np];
+            for (const vs of vectors) {
+                var vec = JSON.parse(vs);
+                var p = vec.map(function (v, j) { return v + np[j] })
+                co_points.push(p);
+            }
+            return co_points
         }
     }
 
@@ -311,8 +325,10 @@ setCollinearityButton.addEventListener("click", () => {
     var v = collinearChoices.querySelector("[name=collinear-options]:checked").getAttribute("value");
     var modal = bootstrap.Modal.getInstance(modalElement)
     modal.hide();
-    collinearity = parseInt(v);
+    sessionStorage.setItem(`${shape}_collinearity`, v);
+    collinearity = null;
     set_collinearity();
+    refresh_grid();
 });
 
 /*
@@ -331,6 +347,7 @@ var wdw_w;
 var wdw_h;
 var shape_class;
 var collinearity;
+var collinear_points;
 
 theme = sessionStorage.getItem("theme", "light");
 if (theme == null) {
