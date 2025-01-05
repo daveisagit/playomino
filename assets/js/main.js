@@ -138,6 +138,7 @@ function update_grid() {
         });
     update.exit().remove();
 
+    // add the central dot
     update = g_cells.selectAll("circle").data(show_points);
     update.enter()
         .append("circle")
@@ -145,7 +146,6 @@ function update_grid() {
         .attr("r", cell_size / 10)
         .attr("cx", d => { return shape_class.to_pixel(layout, d).x.toFixed(0) })
         .attr("cy", d => { return shape_class.to_pixel(layout, d).y.toFixed(0) });
-
     update.exit().remove();
 
     // add the line
@@ -224,18 +224,17 @@ function set_header() {
     redoButton.disabled = (undo_index == points.length);
 }
 
-function refresh_ui() {
-    update_grid();
-    set_header();
-    set_view_box();
-}
-
-
 function refresh_grid() {
     set_layout();
     get_points();
     backtrack();
     refresh_ui();
+}
+
+function refresh_ui() {
+    update_grid();
+    set_header();
+    set_view_box();
 }
 
 function find_collinear(np) {
@@ -422,6 +421,32 @@ setCollinearityButton.addEventListener("click", () => {
 MAIN Script
 =========================================================================
 */
+
+function version_upgrade() {
+    var cur_ver = 1;
+    const s_ver = sessionStorage.getItem("version");
+    if (s_ver != null) {
+        cur_ver = parseInt(s_ver);
+    }
+
+    if (cur_ver == 1) {
+        for (const shp of ["squ", "hex"]) {
+            var s = sessionStorage.getItem(`${shp}_points`);
+            var ps = [];
+            if (s != null) {
+                ps = JSON.parse(s);
+            }
+            var ins_arr = [];
+            for (const p of ps) {
+                var ins = ["+", p];
+                ins_arr.push(ins);
+            }
+            sessionStorage.setItem(`${shp}_instructions`, JSON.stringify(ins_arr));
+        }
+    }
+
+}
+
 const cell_size = 20;
 var points;
 var border;
@@ -437,7 +462,9 @@ var collinear_points;
 var last_border_cell_selected;
 var collinear_line;
 
-theme = sessionStorage.getItem("theme", "light");
+version_upgrade();
+
+theme = sessionStorage.getItem("theme");
 if (theme == null) {
     theme = "dark";
 }
