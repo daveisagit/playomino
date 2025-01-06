@@ -38,21 +38,10 @@ class Shape {
         }
         return res;
     }
-    border(pt, undo_index = null) {
-
-        if (undo_index == null) {
-            undo_index = pt.length;
-        }
-
-        var ps = new Set();
-        for (var i = 0; i < undo_index; i++) {
-            p = pt[i];
-            ps.add(JSON.stringify(p));
-        }
-
+    border(ps) {
         var bs = new Set();
-        for (var i = 0; i < undo_index; i++) {
-            var p = pt[i];
+        for (const s of ps) {
+            var p = JSON.parse(s);
             for (const n of this.neighbours(p)) {
                 var b = JSON.stringify(n)
                 if (!ps.has(b)) {
@@ -60,13 +49,7 @@ class Shape {
                 }
             }
         }
-
-        var res = [];
-        for (const b of bs) {
-            var p = JSON.parse(b);
-            res.push(p);
-        }
-        return res
+        return bs;
     }
 }
 

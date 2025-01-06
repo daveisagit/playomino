@@ -49,32 +49,50 @@ function set_collinearity() {
     document.getElementById(`co${collinearity}`).checked = true;
 }
 
-function get_points() {
-    // Get points from session storage
-    if (points == null) {
-        points = [shape_class.origin];
-        var ps = sessionStorage.getItem(`${shape}_points`);
+function get_instructions() {
+    // Get the instructions and point of undo from session storage
+    var s;
+    if (instructions == null) {
+        instructions = [["+", shape_class.origin]];
+        var ps = sessionStorage.getItem(`${shape}_instructions`);
         if (ps != null) {
-            points = JSON.parse(ps);
+            instructions = JSON.parse(ps);
         }
     }
 
-    undo_index = points.length;
-    var ui = sessionStorage.getItem(`${shape}_undo_index`);
-    if (ui != null) {
-        undo_index = parseInt(ui);
+    undo_index = instructions.length;
+    s = sessionStorage.getItem(`${shape}_undo_index`);
+    if (s != null) {
+        undo_index = parseInt(s);
     }
-
+    if (undo_index > instructions.length) {
+        undo_index = instructions.length;
+    }
 }
+
+function set_points() {
+    // create the points set
+    set_of_points = new Set();
+    for (var i = 0; i < undo_index; i++) {
+        var ins = instructions[i];
+        if (ins[0] == "+") {
+            set_of_points.add(JSON.stringify(ins[1]));
+        }
+        if (ins[0] == "-") {
+            set_of_points.delete(JSON.stringify(ins[1]));
+        }
+    }
+}
+
 
 function update_grid() {
 
     var update;
 
     // generate the border
-    border = shape_class.border(points, undo_index = undo_index);
+    border = shape_class.border(set_of_points);
 
-    update = g_border.selectAll("polygon").data(border);
+    update = g_border.selectAll("polygon").data(Array.from(border));
     update.enter()
         .append("polygon")
         .merge(update)
@@ -87,25 +105,26 @@ function update_grid() {
         })
         .classed("collinear", d => {
             if (collinear_points == null) return false;
-            if (JSON.stringify(last_border_cell_selected) == JSON.stringify(d)) return true;
+            if (last_border_cell_selected == d) return true;
             return false;
         })
         .attr("points", d => {
-            return shape_class.polygon_corners(layout, d).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
+            const ad = JSON.parse(d);
+            return shape_class.polygon_corners(layout, ad).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
         })
         .on("click", d => {
 
-            if (collinear_points != null && JSON.stringify(last_border_cell_selected) == JSON.stringify(d)) {
+            if (collinear_points != null && last_border_cell_selected == d) {
                 collinear_points = null;
             } else {
                 last_border_cell_selected = d;
                 collinear_points = find_collinear(d);
                 if (collinear_points == null) {
-                    points.length = undo_index;
-                    points.push(d);
+                    instructions.length = undo_index;
+                    instructions.push(["+", JSON.parse(d)]);
+                    set_of_points.add(d);
                     undo_index += 1;
-                    var sps = JSON.stringify(points);
-                    sessionStorage.setItem(`${shape}_points`, sps);
+                    sessionStorage.setItem(`${shape}_instructions`, JSON.stringify(instructions));
                     sessionStorage.setItem(`${shape}_undo_index`, undo_index);
                 } else {
                     set_collinear_line();
@@ -117,13 +136,7 @@ function update_grid() {
         });
     update.exit().remove();
 
-    // Points - up to the undo index
-    var show_points = [];
-    for (var i = 0; i < undo_index; i++) {
-        show_points.push(points[i]);
-    }
-
-    update = g_cells.selectAll("polygon").data(show_points);
+    update = g_cells.selectAll("polygon").data(Array.from(set_of_points));
     update.enter()
         .append("polygon")
         .merge(update)
@@ -134,18 +147,25 @@ function update_grid() {
             }
         })
         .attr("points", d => {
-            return shape_class.polygon_corners(layout, d).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
+            const ad = JSON.parse(d);
+            return shape_class.polygon_corners(layout, ad).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
         });
     update.exit().remove();
 
     // add the central dot
-    update = g_cells.selectAll("circle").data(show_points);
+    update = g_cells.selectAll("circle").data(Array.from(set_of_points));
     update.enter()
         .append("circle")
         .merge(update)
         .attr("r", cell_size / 10)
-        .attr("cx", d => { return shape_class.to_pixel(layout, d).x.toFixed(0) })
-        .attr("cy", d => { return shape_class.to_pixel(layout, d).y.toFixed(0) });
+        .attr("cx", d => {
+            const ad = JSON.parse(d);
+            return shape_class.to_pixel(layout, ad).x.toFixed(0)
+        })
+        .attr("cy", d => {
+            const ad = JSON.parse(d);
+            return shape_class.to_pixel(layout, ad).y.toFixed(0)
+        });
     update.exit().remove();
 
     // add the line
@@ -156,10 +176,18 @@ function update_grid() {
     update.enter()
         .append("line")
         .merge(update)
-        .attr("x1", d => { return shape_class.to_pixel(layout, d[0]).x.toFixed(0) })
-        .attr("y1", d => { return shape_class.to_pixel(layout, d[0]).y.toFixed(0) })
-        .attr("x2", d => { return shape_class.to_pixel(layout, d[1]).x.toFixed(0) })
-        .attr("y2", d => { return shape_class.to_pixel(layout, d[1]).y.toFixed(0) });
+        .attr("x1", d => {
+            return shape_class.to_pixel(layout, d[0]).x.toFixed(0)
+        })
+        .attr("y1", d => {
+            return shape_class.to_pixel(layout, d[0]).y.toFixed(0)
+        })
+        .attr("x2", d => {
+            return shape_class.to_pixel(layout, d[1]).x.toFixed(0)
+        })
+        .attr("y2", d => {
+            return shape_class.to_pixel(layout, d[1]).y.toFixed(0)
+        });
     update.exit().remove();
 
 
@@ -176,10 +204,7 @@ function set_layout() {
 
 
 function set_view_box() {
-    /*
-    Keep the <g> border element central and of optimal size to fill the space
-    */
-
+    // Keep the <g> border element central and of optimal size to fill the space
     let box = g_border.node().getBBox();
     let wdw_r = wdw_h / wdw_w;
     let box_wdw_ratio = box.width / wdw_w;
@@ -219,29 +244,36 @@ function set_theme() {
 }
 
 function set_header() {
-    sizeElement.textContent = undo_index.toFixed(0);
+    sizeElement.textContent = set_of_points.size;
     undoButton.disabled = (undo_index == 1);
-    redoButton.disabled = (undo_index == points.length);
+    redoButton.disabled = (undo_index == instructions.length);
 }
 
 function refresh_grid() {
     set_layout();
-    get_points();
+    get_instructions();
     backtrack();
+    set_points();
     refresh_ui();
 }
 
 function refresh_ui() {
+    // expects points to be set either from above
+    // or an event on grid that has handled updating the point set
     update_grid();
     set_header();
     set_view_box();
 }
 
-function find_collinear(np) {
+function find_collinear(snp) {
+    // return a set of points in the points set that are collinear 
+    // with the given point (expected in string format)
+
+    const np = JSON.parse(snp);
 
     var vectors = [];
-    for (var i = 0; i < undo_index; i++) {
-        var p = points[i];
+    for (const ps of set_of_points) {
+        var p = JSON.parse(ps);
         const vec = p.map(function (v, j) { return v - np[j] })
         vectors.push(vec);
     }
@@ -272,7 +304,7 @@ function find_collinear(np) {
         o = orthogonal[k];
         if (o.size > collinearity - 1) {
             vectors = Array.from(o);
-            var co_points = [JSON.stringify(np)];
+            var co_points = [snp];
             for (const vs of vectors) {
                 var vec = JSON.parse(vs);
                 var p = vec.map(function (v, j) { return v + np[j] })
@@ -287,12 +319,17 @@ function find_collinear(np) {
 }
 
 function backtrack() {
-    // backtrack as needed to stay within the collinearity
+    // set the undo_index to the first valid point
+    // should only be needed when we reduce collinearity
+    // but calling every time to be sure.
     var i_limit = undo_index;
     for (var i = 1; i < i_limit; i++) {
+        const ins = instructions[i];
         undo_index = i;
-        var p = points[undo_index];
-        var cp = find_collinear(p);
+        if (ins[0] == "-") continue;
+        set_points();
+        var ps = JSON.stringify(ins[1]);
+        var cp = find_collinear(ps);
         if (cp != null) break;
         undo_index += 1;
     }
@@ -300,6 +337,7 @@ function backtrack() {
 }
 
 function set_collinear_line() {
+    // set the endpoints of the line
     var cps = [];
     var arr = Array.from(collinear_points);
     for (const p of arr) {
@@ -348,7 +386,8 @@ shapeButton.addEventListener("click", () => {
         shape = "squ";
     }
     sessionStorage.setItem("shape", shape);
-    points = null;
+    instructions = null;
+    set_of_points = null;
     collinear_points = null;
     last_border_cell_selected = null;
     set_shape();
@@ -359,9 +398,11 @@ shapeButton.addEventListener("click", () => {
 Clear
 */
 clearButton.addEventListener("click", () => {
-    sessionStorage.removeItem(`${shape}_points`);
+    sessionStorage.removeItem(`${shape}_points`);  // leave for now
+    sessionStorage.removeItem(`${shape}_instructions`);
     sessionStorage.removeItem(`${shape}_undo_index`);
-    points = null;
+    instructions = null;
+    set_of_points = null;
     collinear_points = null;
     last_border_cell_selected = null;
     refresh_grid();
@@ -376,8 +417,8 @@ undoButton.addEventListener("click", () => {
         sessionStorage.setItem(`${shape}_undo_index`, undo_index);
         collinear_points = null;
         last_border_cell_selected = null;
+        refresh_grid();
     }
-    refresh_grid();
 });
 
 
@@ -385,17 +426,21 @@ undoButton.addEventListener("click", () => {
 Redo
 */
 redoButton.addEventListener("click", () => {
-    if (undo_index < points.length) {
-        last_border_cell_selected = points[undo_index]
-        collinear_points = find_collinear(last_border_cell_selected);
-        if (collinear_points == null) {
-            undo_index += 1;
-            sessionStorage.setItem(`${shape}_undo_index`, undo_index);
-        } else {
-            set_collinear_line();
+    if (undo_index < instructions.length) {
+        const ins = instructions[undo_index];
+        last_border_cell_selected = null;
+        if (ins[0] == "+") {
+            last_border_cell_selected = JSON.stringify(ins[1]);
+            collinear_points = find_collinear(last_border_cell_selected);
+            if (collinear_points == null) {
+                undo_index += 1;
+                sessionStorage.setItem(`${shape}_undo_index`, undo_index);
+            } else {
+                set_collinear_line();
+            }
         }
+        refresh_grid();
     }
-    refresh_grid();
 });
 
 /*
@@ -423,32 +468,31 @@ MAIN Script
 */
 
 function version_upgrade() {
-    var cur_ver = 1;
-    const s_ver = sessionStorage.getItem("version");
-    if (s_ver != null) {
-        cur_ver = parseInt(s_ver);
-    }
 
-    if (cur_ver == 1) {
-        for (const shp of ["squ", "hex"]) {
-            var s = sessionStorage.getItem(`${shp}_points`);
-            var ps = [];
-            if (s != null) {
-                ps = JSON.parse(s);
-            }
-            var ins_arr = [];
-            for (const p of ps) {
-                var ins = ["+", p];
-                ins_arr.push(ins);
-            }
-            sessionStorage.setItem(`${shp}_instructions`, JSON.stringify(ins_arr));
+    for (const shp of ["squ", "hex"]) {
+        var s;
+        s = sessionStorage.getItem(`${shp}_instructions`);
+        if (s != null) continue;
+
+        s = sessionStorage.getItem(`${shp}_points`);
+        var ps = [];
+        if (s != null) {
+            ps = JSON.parse(s);
         }
+        var ins_arr = [];
+        for (const p of ps) {
+            var ins = ["+", p];
+            ins_arr.push(ins);
+        }
+        sessionStorage.setItem(`${shp}_instructions`, JSON.stringify(ins_arr));
+        sessionStorage.removeItem(`${shp}_points`);
     }
 
 }
 
 const cell_size = 20;
-var points;
+var instructions;
+var set_of_points;
 var border;
 var theme;
 var undo_index = 0;
