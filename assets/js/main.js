@@ -1,5 +1,6 @@
 import * as poly from "./poly.js";
 import * as mtx from "./matrix.js";
+import { UnionFind } from "./union_find.js"
 
 /*
 DOM elements
@@ -144,12 +145,15 @@ function update_grid() {
         .attr("points", d => {
             const ad = JSON.parse(d);
             return shape_class.polygon_corners(layout, ad).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
+        })
+        .on("click", (e, d) => {
+            console.log(cell_can_be_removed(d));
         });
 
     // add the central dot
     update = g_cells.selectAll("circle").data(Array.from(set_of_points));
     update.join(
-        enter => enter.append("circle").attr("r", cell_size).transition(2000).attr("r", cell_size / 10)
+        enter => enter.append("circle").attr("r", cell_size / 2).transition(3000).attr("r", cell_size / 10)
     )
         .attr("cx", d => {
             const ad = JSON.parse(d);
@@ -345,6 +349,33 @@ function set_collinear_line() {
     }
 }
 
+function cell_can_be_removed(p) {
+    if (set_of_points.size <= 1) return false;
+
+    var arr_of_cells = {};
+    var idx = 0;
+    for (const c of set_of_points) {
+        if (c == p) continue;
+        arr_of_cells[c] = idx;
+        idx += 1;
+    }
+
+    const uf = new UnionFind(set_of_points.size - 1);
+    for (const c in arr_of_cells) {
+        if (c == p) continue;
+        var ci = arr_of_cells[c];
+        var ca = JSON.parse(c);
+        for (const n of shape_class.neighbours(ca)) {
+            var ns = JSON.stringify(n);
+            if (ns in arr_of_cells) {
+                var ni = arr_of_cells[ns];
+                uf.union(ci, ni);
+            }
+        }
+    }
+    var r = uf.count() == 1
+    return r;
+}
 
 /*
 =========================================================================
