@@ -22,6 +22,10 @@
     stroke-width: var(--cell-stroke-width);
 }
 
+.cell>polygon.added {
+    fill: yellow;
+}
+
 .cell>polygon.collinear {
     fill: var(--cell-point-collinear);
 }

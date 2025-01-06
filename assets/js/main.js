@@ -93,9 +93,7 @@ function update_grid() {
     border = shape_class.border(set_of_points);
 
     update = g_border.selectAll("polygon").data(Array.from(border));
-    update.enter()
-        .append("polygon")
-        .merge(update)
+    update.join("polygon")
         .classed("invalid", d => {
             var cp = find_collinear(d);
             if (cp == null) {
@@ -112,7 +110,7 @@ function update_grid() {
             const ad = JSON.parse(d);
             return shape_class.polygon_corners(layout, ad).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
         })
-        .on("click", d => {
+        .on("click", (e, d) => {
 
             if (collinear_points != null && last_border_cell_selected == d) {
                 collinear_points = null;
@@ -134,12 +132,9 @@ function update_grid() {
             refresh_ui();
 
         });
-    update.exit().remove();
 
     update = g_cells.selectAll("polygon").data(Array.from(set_of_points));
-    update.enter()
-        .append("polygon")
-        .merge(update)
+    update.join("polygon")
         .classed("collinear", d => {
             if (collinear_points == null) return false;
             if (collinear_points.has(d)) {
@@ -150,14 +145,12 @@ function update_grid() {
             const ad = JSON.parse(d);
             return shape_class.polygon_corners(layout, ad).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
         });
-    update.exit().remove();
 
     // add the central dot
     update = g_cells.selectAll("circle").data(Array.from(set_of_points));
-    update.enter()
-        .append("circle")
-        .merge(update)
-        .attr("r", cell_size / 10)
+    update.join(
+        enter => enter.append("circle").attr("r", cell_size).transition(2000).attr("r", cell_size / 10)
+    )
         .attr("cx", d => {
             const ad = JSON.parse(d);
             return shape_class.to_pixel(layout, ad).x.toFixed(0)
@@ -166,16 +159,13 @@ function update_grid() {
             const ad = JSON.parse(d);
             return shape_class.to_pixel(layout, ad).y.toFixed(0)
         });
-    update.exit().remove();
 
     // add the line
     if (collinear_points == null) {
         collinear_line = [];
     }
     update = g_cells.selectAll("line").data(collinear_line);
-    update.enter()
-        .append("line")
-        .merge(update)
+    update.join("line")
         .attr("x1", d => {
             return shape_class.to_pixel(layout, d[0]).x.toFixed(0)
         })
@@ -188,8 +178,6 @@ function update_grid() {
         .attr("y2", d => {
             return shape_class.to_pixel(layout, d[1]).y.toFixed(0)
         });
-    update.exit().remove();
-
 
 }
 
