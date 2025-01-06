@@ -142,7 +142,7 @@ function update_grid() {
         .merge(update)
         .classed("collinear", d => {
             if (collinear_points == null) return false;
-            if (collinear_points.has(JSON.stringify(d))) {
+            if (collinear_points.has(d)) {
                 return true;
             }
         })
@@ -468,7 +468,7 @@ MAIN Script
 */
 
 function version_upgrade() {
-
+    // replace points with instructions
     for (const shp of ["squ", "hex"]) {
         var s;
         s = sessionStorage.getItem(`${shp}_instructions`);
@@ -487,7 +487,6 @@ function version_upgrade() {
         sessionStorage.setItem(`${shp}_instructions`, JSON.stringify(ins_arr));
         sessionStorage.removeItem(`${shp}_points`);
     }
-
 }
 
 const cell_size = 20;
