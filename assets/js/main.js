@@ -147,14 +147,23 @@ function update_grid() {
             return shape_class.polygon_corners(layout, ad).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
         })
         .on("click", (e, d) => {
-            console.log(cell_can_be_removed(d));
+            if (cell_can_be_removed(d)) {
+                instructions.push(["-", JSON.parse(d)]);
+                set_of_points.delete(d);
+                undo_index += 1;
+                sessionStorage.setItem(`${shape}_instructions`, JSON.stringify(instructions));
+                sessionStorage.setItem(`${shape}_undo_index`, undo_index);
+            }
+            refresh_ui();
         });
 
     // add the central dot
     update = g_cells.selectAll("circle").data(Array.from(set_of_points));
-    update.join(
-        enter => enter.append("circle").attr("r", cell_size / 2).transition(3000).attr("r", cell_size / 10)
-    )
+    update.join("circle")
+        // update.join(
+        //     enter => enter.append("circle").attr("r", cell_size / 2).transition(3000).attr("r", cell_size / 10)
+        // )
+        .attr("r", cell_size / 10)
         .attr("cx", d => {
             const ad = JSON.parse(d);
             return shape_class.to_pixel(layout, ad).x.toFixed(0)
@@ -318,7 +327,10 @@ function backtrack() {
     for (var i = 1; i < i_limit; i++) {
         const ins = instructions[i];
         undo_index = i;
-        if (ins[0] == "-") continue;
+        if (ins[0] == "-") {
+            undo_index += 1;
+            continue;
+        }
         set_points();
         var ps = JSON.stringify(ins[1]);
         var cp = find_collinear(ps);
@@ -457,6 +469,10 @@ redoButton.addEventListener("click", () => {
             } else {
                 set_collinear_line();
             }
+        }
+        if (ins[0] == "-") {
+            undo_index += 1;
+            sessionStorage.setItem(`${shape}_undo_index`, undo_index);
         }
         refresh_grid();
     }
