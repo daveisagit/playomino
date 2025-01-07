@@ -523,7 +523,15 @@ MAIN Script
 function version_upgrade() {
     // replace points with instructions
     for (const shp of ["squ", "hex"]) {
+        var cls;
         var s;
+        if (shp == "squ") {
+            cls = new poly.Square();
+        }
+        if (shp == "hex") {
+            cls = new poly.Hexagon();
+        }
+
         s = sessionStorage.getItem(`${shp}_instructions`);
         if (s != null) continue;
 
@@ -536,6 +544,9 @@ function version_upgrade() {
         for (const p of ps) {
             var ins = ["+", p];
             ins_arr.push(ins);
+        }
+        if (ins_arr.length == 0) {
+            ins_arr = [["+", cls.origin]];
         }
         sessionStorage.setItem(`${shp}_instructions`, JSON.stringify(ins_arr));
         sessionStorage.removeItem(`${shp}_points`);
