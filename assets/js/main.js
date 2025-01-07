@@ -148,6 +148,7 @@ function update_grid() {
         })
         .on("click", (e, d) => {
             if (cell_can_be_removed(d)) {
+                instructions.length = undo_index;
                 instructions.push(["-", JSON.parse(d)]);
                 set_of_points.delete(d);
                 undo_index += 1;
@@ -473,6 +474,8 @@ redoButton.addEventListener("click", () => {
         if (ins[0] == "-") {
             undo_index += 1;
             sessionStorage.setItem(`${shape}_undo_index`, undo_index);
+            collinear_points = null;
+            last_border_cell_selected = null;
         }
         refresh_grid();
     }
