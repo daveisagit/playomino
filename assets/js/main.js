@@ -166,7 +166,7 @@ function update_grid() {
             } else {
                 d3.select(e.currentTarget)
                     .attr("fill", "firebrick")
-                    .transition().duration(1000)
+                    .transition().duration(1200)
                     .attr("fill", cell_fill);
             }
             refresh_ui();
