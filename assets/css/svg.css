@@ -3,6 +3,7 @@
     /*========== Cells ==========*/
     --cell-point-fill: steelblue;
     --cell-point-collinear: slateblue;
+    --cell-point-not_removable: firebrick;
     --cell-border-valid: green;
     --cell-border-invalid: firebrick;
     --cell-stroke-light: black;
@@ -18,12 +19,7 @@
 /* points */
 .cell>polygon {
     stroke: var(--cell-stroke-light);
-    fill: var(--cell-point-fill);
     stroke-width: var(--cell-stroke-width);
-}
-
-.cell>polygon.added {
-    fill: yellow;
 }
 
 .cell>polygon.collinear {
@@ -34,6 +30,7 @@
     stroke: var(--cell-stroke-light);
     fill: var(--cell-stroke-light);
 }
+
 
 
 /* border */

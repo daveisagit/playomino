@@ -93,7 +93,7 @@ function update_grid() {
     // generate the border
     border = shape_class.border(set_of_points);
 
-    update = g_border.selectAll("polygon").data(Array.from(border));
+    update = g_border.selectAll("polygon").data(Array.from(border), (d) => { return d; });
     update.join("polygon")
         .classed("invalid", d => {
             var cp = find_collinear(d);
@@ -113,8 +113,9 @@ function update_grid() {
         })
         .on("click", (e, d) => {
 
-            if (collinear_points != null && last_border_cell_selected == d) {
+            if (last_border_cell_selected == d) {
                 collinear_points = null;
+                last_border_cell_selected = null;
             } else {
                 last_border_cell_selected = d;
                 collinear_points = find_collinear(d);
@@ -134,8 +135,15 @@ function update_grid() {
 
         });
 
-    update = g_cells.selectAll("polygon").data(Array.from(set_of_points));
-    update.join("polygon")
+    update = g_cells.selectAll("polygon").data(Array.from(set_of_points), (d) => { return d; });
+    update.join(
+        enter => enter.append("polygon")
+            .attr("fill", "green")
+            .attr("fill-opacity", 0.2)
+            .transition().duration(500)
+            .attr("fill", cell_fill)
+            .attr("fill-opacity", 1)
+    )
         .classed("collinear", d => {
             if (collinear_points == null) return false;
             if (collinear_points.has(d)) {
@@ -147,6 +155,7 @@ function update_grid() {
             return shape_class.polygon_corners(layout, ad).map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" ")
         })
         .on("click", (e, d) => {
+            last_border_cell_selected = null;
             if (cell_can_be_removed(d)) {
                 instructions.length = undo_index;
                 instructions.push(["-", JSON.parse(d)]);
@@ -154,17 +163,22 @@ function update_grid() {
                 undo_index += 1;
                 sessionStorage.setItem(`${shape}_instructions`, JSON.stringify(instructions));
                 sessionStorage.setItem(`${shape}_undo_index`, undo_index);
+            } else {
+                d3.select(e.currentTarget)
+                    .attr("fill", "firebrick")
+                    .transition().duration(1000)
+                    .attr("fill", cell_fill);
             }
             refresh_ui();
         });
 
     // add the central dot
-    update = g_cells.selectAll("circle").data(Array.from(set_of_points));
-    update.join("circle")
-        // update.join(
-        //     enter => enter.append("circle").attr("r", cell_size / 2).transition(3000).attr("r", cell_size / 10)
-        // )
-        .attr("r", cell_size / 10)
+    update = g_cells.selectAll("circle").data(Array.from(set_of_points), (d) => { return d; });
+    // update.join("circle")
+    update.join(
+        enter => enter.append("circle").attr("r", cell_size / 2).transition().duration(500).attr("r", cell_size / 10)
+    )
+        // .attr("r", cell_size / 10)
         .attr("cx", d => {
             const ad = JSON.parse(d);
             return shape_class.to_pixel(layout, ad).x.toFixed(0)
@@ -193,6 +207,7 @@ function update_grid() {
             return shape_class.to_pixel(layout, d[1]).y.toFixed(0)
         });
 
+    collinear_points = null;
 }
 
 
@@ -527,6 +542,7 @@ function version_upgrade() {
     }
 }
 
+const cell_fill = "steelblue";
 const cell_size = 20;
 var instructions;
 var set_of_points;
