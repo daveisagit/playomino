@@ -140,7 +140,7 @@ function update_grid() {
         enter => enter.append("polygon")
             .attr("fill", "green")
             .attr("fill-opacity", 0.2)
-            .transition().duration(500)
+            .transition().duration(600)
             .attr("fill", cell_fill)
             .attr("fill-opacity", 1)
     )
@@ -174,11 +174,11 @@ function update_grid() {
 
     // add the central dot
     update = g_cells.selectAll("circle").data(Array.from(set_of_points), (d) => { return d; });
-    // update.join("circle")
-    update.join(
-        enter => enter.append("circle").attr("r", cell_size / 2).transition().duration(500).attr("r", cell_size / 10)
-    )
-        // .attr("r", cell_size / 10)
+    update.join("circle")
+        // update.join(
+        //     enter => enter.append("circle").attr("r", cell_size / 2).transition().duration(500).attr("r", cell_size / 10)
+        // )
+        .attr("r", cell_size / 10)
         .attr("cx", d => {
             const ad = JSON.parse(d);
             return shape_class.to_pixel(layout, ad).x.toFixed(0)
