@@ -1,3 +1,6 @@
+/*
+Module for supporting the geometry 
+*/
 
 export class Point {
     constructor(x, y) {

@@ -1,3 +1,7 @@
+/*
+Module for matrix calculations
+*/
+
 export function are_parallel(u, v) {
     var cu = Array.from(u);
     var cv = Array.from(v);

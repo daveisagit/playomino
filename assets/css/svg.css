@@ -80,16 +80,10 @@ div.dark .cell>polygon {
     stroke: var(--cell-stroke-dark);
 }
 
-/* div.dark .border>polygon {
-    stroke: var(--cell-stroke-dark);
-} */
-
 div.dark .cell>circle {
     stroke: var(--cell-stroke-dark);
     fill: var(--cell-stroke-dark);
 }
-
-
 
 
 
